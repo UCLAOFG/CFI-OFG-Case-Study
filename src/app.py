@@ -6,13 +6,16 @@ import numpy as np
 import plotly.graph_objects as go
 import re
 import pathlib
-import dash_auth
+#import dash_auth
+#import dash_mantine_components as dmc
 
 external_style = ['https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css']
 
 app = Dash(__name__, suppress_callback_exceptions=True,external_stylesheets=[dbc.themes.COSMO,external_style])
 app.title = 'Center for Impact Case Study'
 server = app.server
+
+
 
 # auth = dash_auth.BasicAuth(
 #     app,
@@ -25,10 +28,12 @@ pd.options.mode.chained_assignment = None
 PATH = pathlib.Path(__file__).parent
 DATA_PATH = PATH.joinpath("data").resolve()
 
-df=pd.read_excel(DATA_PATH.joinpath('2024.02.28_Updated Transp. Index 2023 FC.xlsx'),sheet_name='Full Dataset_Board', nrows=500)
+df=pd.read_excel(DATA_PATH.joinpath('Legacy_modeled_Qualtrics_Data.xlsx'),sheet_name='Sheet1')
+#df2=pd.read_excel(DATA_PATH.joinpath('2024.02.28_Updated Transp. Index 2023 FC.xlsx'),sheet_name='Full Dataset_Board',nrows=500)
+df['GICS.Sector'] = df['GICS.Sector'].astype(object)
+
 dfnz2 = pd.read_excel(DATA_PATH.joinpath('2024.04.04-NZ for Descriptive Testing_not full QC w sectors.xlsx'),sheet_name='Dissertation Net Zero & Governa', nrows=496)
 
-#dfpivot = pd.read_csv(DATA_PATH.joinpath('Pivoted_master_data.csv'))
 
 def company_list(sector):
     dfcs = df.loc[df['GICS.Sector'] == sector,['Company.Name','Revenue']]
@@ -182,21 +187,21 @@ def nghg1(sector,company_list):
     tnghg1 = tnghg1[masknz11]
     
     tnghg1_merged = tnghg1.merge(tghg1_sel10,on='Company')
-    tnghg1_merged['Normalised GHG1'] = tnghg1_merged['Total GHG1']*1000/tnghg1_merged['Revenue']
-    tnghg1_merged['Normalised GHG1 Rounded'] = pd.to_numeric(tnghg1_merged['Normalised GHG1']).round(2)
-    tnghg1_merged = tnghg1_merged.sort_values(by='Normalised GHG1', ascending=False)
+    tnghg1_merged['Normalized GHG1'] = tnghg1_merged['Total GHG1']*1000/tnghg1_merged['Revenue']
+    tnghg1_merged['Normalized GHG1 Rounded'] = pd.to_numeric(tnghg1_merged['Normalized GHG1']).round(2)
+    tnghg1_merged = tnghg1_merged.sort_values(by='Normalized GHG1', ascending=False)
 
     fontsize = 150/tnghg1_merged.shape[0]
     if (fontsize > 15):
         fontsize = 15
     
-    fig2 = px.bar(tnghg1_merged, x='Company', y='Normalised GHG1',text='Normalised GHG1 Rounded',color_discrete_sequence=['#2774AE'],height = 780)
+    fig2 = px.bar(tnghg1_merged, x='Company', y='Normalized GHG1',text='Normalized GHG1 Rounded',color_discrete_sequence=['#2774AE'],height = 780)
     fig2.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",font=dict(size=fontsize))
     fig2.update_xaxes(title=None)
     fig2.update_yaxes(title=None)
     fig2.update_layout(
     title=go.layout.Title(
-        text="Normalised GHG Scope 1 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
+        text="Normalized GHG Scope 1 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
         #xref="paper",
         x=0.5,
         font_size=30
@@ -286,14 +291,14 @@ def nghg2(sector,company_list):
     tnghg2 = tnghg2[masknz22]
     
     tnghg2_merged = tnghg2.merge(tghg2,on='Company')
-    tnghg2_merged['Normalised market-based GHG2'] = tnghg2_merged['Total market-based GHG2']/tnghg2_merged['Revenue']
-    tnghg2_merged['Normalised location-based GHG2'] = tnghg2_merged['Total location-based GHG 2']/tnghg2_merged['Revenue']
-    tnghg2_merged['Normalised uncategorised GHG2'] = tnghg2_merged['Total uncategorised GHG 2']/tnghg2_merged['Revenue']
+    tnghg2_merged['Normalized market-based GHG2'] = tnghg2_merged['Total market-based GHG2']/tnghg2_merged['Revenue']
+    tnghg2_merged['Normalized location-based GHG2'] = tnghg2_merged['Total location-based GHG 2']/tnghg2_merged['Revenue']
+    tnghg2_merged['Normalized uncategorised GHG2'] = tnghg2_merged['Total uncategorised GHG 2']/tnghg2_merged['Revenue']
     tnghg2_merged.drop(labels=['Revenue','Total market-based GHG2','Total location-based GHG 2','Total uncategorised GHG 2'], axis=1, inplace=True)
     
     tnghg2_melted = pd.melt(tnghg2_merged, id_vars='Company')
 #tghg2_melted[['Scope 2 type']] = re.search(r'Total(.*?)GHG', tghg2_melted['variable'])
-    tnghg2_melted['Scope 2 Category'] = tnghg2_melted['variable'].apply(lambda x: re.search(r'Normalised(.*?)GHG', x).group(1).strip() if re.search(r'Normalised(.*?)GHG', x) else None)
+    tnghg2_melted['Scope 2 Category'] = tnghg2_melted['variable'].apply(lambda x: re.search(r'Normalized(.*?)GHG', x).group(1).strip() if re.search(r'Normalized(.*?)GHG', x) else None)
     tnghg2_melted['value'] = pd.to_numeric(tnghg2_melted['value'], errors='coerce')
     tnghg2_melted['value_rounded'] = (tnghg2_melted['value']).round(2).astype(str).str.replace('nan', 'NR')
 
@@ -323,7 +328,7 @@ def nghg2(sector,company_list):
     fig322.update_yaxes(title=None)
     fig322.update_layout(
     title=go.layout.Title(
-        text="Normalised GHG Scope 2 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
+        text="Normalized GHG Scope 2 Emissions<br><sup>(in metric tons per $M revenue)</sup>",
         #xref="paper",
         x=0.5,
         font_size = 30
@@ -428,8 +433,8 @@ def tnghg3(sector,company_list,k1,pp):
     tnghg3 = tnghg3[masknz33]
     
     tnghg33_merged = tghg3_sel10.merge(tnghg3, on='Company')
-    tnghg33_merged['Normalised GHG3'] = (tnghg33_merged['Total GHG3']*1000)/tnghg33_merged['Revenue']
-    tnghg33_merged['Normalised GHG3 Rounded'] = tnghg33_merged['Normalised GHG3'].round(2)
+    tnghg33_merged['Normalized GHG3'] = (tnghg33_merged['Total GHG3']*1000)/tnghg33_merged['Revenue']
+    tnghg33_merged['Normalized GHG3 Rounded'] = tnghg33_merged['Normalized GHG3'].round(2)
     
     tnghg33_merged = tnghg33_merged.sort_values(by=['Total GHG3','Company'], axis = 0, ascending=False)
 
@@ -467,26 +472,30 @@ def tnghg3(sector,company_list,k1,pp):
 
 def water_util(sector,company_list):
     
-    dfwwc = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10a.Response','CM10c.Response']]
-    dfwwc = dfwwc.rename(columns={"Company.Name":"CompanyName","CM10a.Response":"Water Withdrawal","CM10c.Response":"Water Consumption"})
+#     dfwwc = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10a.Response','CM10c.Response']]
+#     dfwwc = dfwwc.rename(columns={"Company.Name":"CompanyName","CM10a.Response":"Water Withdrawal","CM10c.Response":"Water Consumption"})
+    dfwwc = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10a.Response']]
+    dfwwc = dfwwc.rename(columns={"Company.Name":"CompanyName","CM10a.Response":"Water Withdrawal"})
     dfwwc['Withdrawal'] = dfwwc['Water Withdrawal']/dfwwc['Revenue']
-    dfwwc['Consumption'] = dfwwc['Water Consumption']/dfwwc['Revenue']
+    #dfwwc['Consumption'] = dfwwc['Water Consumption']/dfwwc['Revenue']
     
-    dfwwc = dfwwc.loc[dfwwc['GICS.Sector'] == sector,['CompanyName','Withdrawal','Consumption']]
+    #dfwwc = dfwwc.loc[dfwwc['GICS.Sector'] == sector,['CompanyName','Withdrawal','Consumption']]
+    dfwwc = dfwwc.loc[dfwwc['GICS.Sector'] == sector,['CompanyName','Withdrawal']]
     dfwwc_melted = pd.melt(dfwwc, id_vars='CompanyName')
     dfwwc_melted['value_rounded'] = dfwwc_melted['value'].round(2).astype(str).str.replace('nan', 'NR')
     
     mask12 = dfwwc_melted['CompanyName'].isin(company_list)
     dfwwc_prev10 = dfwwc_melted[mask12].sort_values(by='value', axis=0, ascending=False)
     
-    color_mapping = {'Withdrawal': '#2774AE',
-                     'Consumption': '#F47C30'}
+#     color_mapping = {'Withdrawal': '#2774AE',
+#                      'Consumption': '#F47C30'}
+    #color_mapping = {'Withdrawal': '#2774AE'}
     
     fontsize = 300/dfwwc_prev10.shape[0]
     if (fontsize > 15):
         fontsize = 15
     
-    fig8 = px.bar(dfwwc_prev10, x='CompanyName', y='value',color='variable',text='value_rounded',color_discrete_map=color_mapping,height = 780, barmode='group')
+    fig8 = px.bar(dfwwc_prev10, x='CompanyName', y='value',text='value_rounded',color_discrete_sequence=['#2774AE'],height = 780, barmode='group')
     fig8.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica", font=dict(size=fontsize), legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.85))
     fig8.update_xaxes(title=None)
     fig8.update_yaxes(title=None)
@@ -508,26 +517,30 @@ def water_util(sector,company_list):
 def biodiver(sector,company_list):
     dfbi = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM9.Area.in.hectares']]
     dfbi = dfbi.rename(columns={"Company.Name":"CompanyName","CM9.Area.in.hectares":"Biodiversity Areas"})
-    dfbi['Normalised Biodiversity Areas'] = dfbi['Biodiversity Areas']/dfbi['Revenue']
+    dfbi['Normalized Biodiversity Areas'] = dfbi['Biodiversity Areas']/dfbi['Revenue']
     
     dfbi = dfbi.loc[dfbi['GICS.Sector'] == sector]
-    dfbi['value_rounded'] = dfbi['Normalised Biodiversity Areas'].round(2).astype(str).str.replace('nan', 'NR')
+    dfbi['value_rounded'] = dfbi['Normalized Biodiversity Areas'].round(2).astype(str).str.replace('nan', 'NR')
     #dfbi_sorted = dfbi.sort_values(by='value_rounded', axis=0, ascending=False).head(10)
     
     mask7 = dfbi['CompanyName'].isin(company_list)
-    dfbi_prev10 = dfbi[mask7].sort_values(by='Normalised Biodiversity Areas', axis=0, ascending=False)
+    dfbi_prev10 = dfbi[mask7].sort_values(by='Normalized Biodiversity Areas', axis=0, ascending=False)
 
     fontsize = 150/dfbi_prev10.shape[0]
     if (fontsize > 15):
         fontsize = 15
     
-    fig7 = px.bar(dfbi_prev10, x="CompanyName", y="Normalised Biodiversity Areas",text='value_rounded', color_discrete_sequence=['#2774AE','#FFB81C','#F47C30'],barmode="group", height = 780)
+    fig7 = px.bar(dfbi_prev10, x="CompanyName", y="Normalized Biodiversity Areas",text='value_rounded', color_discrete_sequence=['#2774AE','#FFB81C','#F47C30'],barmode="group", height = 780)
     fig7.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica",
                   font=dict(size=fontsize))
 
 
     fig7.update_xaxes(title=None)
-    fig7.update_yaxes(title=None)
+    if (dfbi_prev10['Normalized Biodiversity Areas'].max() == 0) :
+        yaxis_scaler = 1
+    else:
+        yaxis_scaler = dfbi_prev10['Normalized Biodiversity Areas'].max()
+    fig7.update_yaxes(title=None,range=[0,yaxis_scaler*1.1])
     fig7.update_layout(
     title=go.layout.Title(
         text="Biodiversity Areas<br><sup>(in hectares per $M revenue)</sup>",
@@ -608,39 +621,39 @@ def enviromentalgovernacemetrics(sector,company_list):
     return fig,emg
 
 
-def tcfdpercentage(sector,company_list):
-    tcfd = df.loc[:,['Company.Name','TCFD average']]
-    tcfd.rename(columns={"Company.Name": "Company"},inplace=True)
+# def tcfdpercentage(sector,company_list):
+#     tcfd = df.loc[:,['Company.Name','TCFD average']]
+#     tcfd.rename(columns={"Company.Name": "Company"},inplace=True)
 
-    tcfd['TCFD average'] = tcfd['TCFD average']*100
-    tcfd['label'] = tcfd['TCFD average'].astype(int).astype(str) + '%'
+#     tcfd['TCFD average'] = tcfd['TCFD average']*100
+#     tcfd['label'] = tcfd['TCFD average'].astype(int).astype(str) + '%'
 
-    mask = tcfd['Company'].isin(company_list)
-    tcfd = tcfd[mask].sort_values(by=['TCFD average','Company'],ascending=False)
+#     mask = tcfd['Company'].isin(company_list)
+#     tcfd = tcfd[mask].sort_values(by=['TCFD average','Company'],ascending=False)
     
-    fontsize = 150/tcfd.shape[0]
-    if (fontsize > 15):
-        fontsize = 15
+#     fontsize = 150/tcfd.shape[0]
+#     if (fontsize > 15):
+#         fontsize = 15
     
-    fig7 = px.bar(tcfd, x='Company', y='TCFD average',text='label',
-              color_discrete_sequence=['#003B5C'],barmode="group")
-    fig7.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica")
-    fig7.update_xaxes(title=None)
-    fig7.update_yaxes(title=None)
-    fig7.update_layout(
-        title=go.layout.Title(
-            text="TCFD Disclosure Percentage<br><sup></sup>",
-            #xref="paper",
-            x=0.5
-        ))
-    fig7.update_traces(textposition='outside', selector=dict(type='bar'))
+#     fig7 = px.bar(tcfd, x='Company', y='TCFD average',text='label',
+#               color_discrete_sequence=['#003B5C'],barmode="group")
+#     fig7.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica")
+#     fig7.update_xaxes(title=None)
+#     fig7.update_yaxes(title=None)
+#     fig7.update_layout(
+#         title=go.layout.Title(
+#             text="TCFD Disclosure Percentage<br><sup></sup>",
+#             #xref="paper",
+#             x=0.5
+#         ))
+#     fig7.update_traces(textposition='outside', selector=dict(type='bar'))
 
-    wrapped_labels = [label.replace(' ', '<br>').replace('-', '<br>') for label in tcfd['Company'].unique().tolist()]
-    fig7.update_xaxes(tickmode='array', tickvals=list(range(len(tcfd['Company'].unique().tolist()))), ticktext=wrapped_labels)
+#     wrapped_labels = [label.replace(' ', '<br>').replace('-', '<br>') for label in tcfd['Company'].unique().tolist()]
+#     fig7.update_xaxes(tickmode='array', tickvals=list(range(len(tcfd['Company'].unique().tolist()))), ticktext=wrapped_labels)
 
-    fig7.update_layout(height = 780,font_family='Helvetica', title_font_family="Helvetica",font=dict(size=fontsize))
+#     fig7.update_layout(height = 780,font_family='Helvetica', title_font_family="Helvetica",font=dict(size=fontsize))
     
-    return fig7
+#     return fig7
 
 
 def boardmember(sector,company_list):
@@ -916,8 +929,11 @@ def index_calculator(sector, company_list, governance_weight, goals_weight, perf
                      "Enter the company\'s Scope 3 emissions in metric tons of CO2e.":"Total GHG3",
 },inplace=True)
 
-    envperf2 = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10c.Response','CM10a.Response','CM9.Area.in.hectares']]
-    envperf2 = envperf2.rename(columns={"Company.Name":"Company","CM10c.Response":"Water Consumption"
+#     envperf2 = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10c.Response','CM10a.Response','CM9.Area.in.hectares']]
+#     envperf2 = envperf2.rename(columns={"Company.Name":"Company","CM10c.Response":"Water Consumption"
+#                                     ,"CM10a.Response":"Water Withdrawal","CM9.Area.in.hectares":"Biodiversity Areas"})
+    envperf2 = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10a.Response','CM9.Area.in.hectares']]
+    envperf2 = envperf2.rename(columns={"Company.Name":"Company"
                                     ,"CM10a.Response":"Water Withdrawal","CM9.Area.in.hectares":"Biodiversity Areas"})
 
 
@@ -936,26 +952,27 @@ def index_calculator(sector, company_list, governance_weight, goals_weight, perf
     #################################
         
     
-    envperf_merged['Normalised GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
-    envperf_merged['Normalised Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
+    #envperf_merged['Normalized Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
+    envperf_merged['Normalized Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
+    envperf_merged['Normalized Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
     
     envperf_prev10 = envperf_merged
 
 #     mask8 = envperf_merged['Company'].isin(company_list)
 #     envperf_prev10 = envperf_merged[mask8]
     
-    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalised GHG1'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalised GHG2'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalised GHG3'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalised Water Consumption'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalised Water Withdrawal'].rank(pct=True)).fillna(0)
-    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalised Biodiversity Areas'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalized GHG1'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalized GHG2'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalized GHG3'].rank(pct=True)).fillna(0)
+    #envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalized Water Consumption'].rank(pct=True)).fillna(0)
+    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalized Water Withdrawal'].rank(pct=True)).fillna(0)
+    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalized Biodiversity Areas'].rank(pct=True)).fillna(0)
     
-    envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Consumption Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
+    #envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Consumption Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
+    envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
     envperf_prev10 = envperf_prev10.sort_values(by='envperfscore', axis=0, ascending=False)
     perfscore = envperf_prev10[['Company','envperfscore']]
     
@@ -1108,8 +1125,11 @@ def overallindex(sector, company_list, governance_weight, goals_weight, performa
                      "Enter the company\'s Scope 3 emissions in metric tons of CO2e.":"Total GHG3",
 },inplace=True)
 
-    envperf2 = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10c.Response','CM10a.Response','CM9.Area.in.hectares']]
-    envperf2 = envperf2.rename(columns={"Company.Name":"Company","CM10c.Response":"Water Consumption"
+    #envperf2 = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10c.Response','CM10a.Response','CM9.Area.in.hectares']]
+    #envperf2 = envperf2.rename(columns={"Company.Name":"Company","CM10c.Response":"Water Consumption","CM10a.Response":"Water Withdrawal","CM9.Area.in.hectares":"Biodiversity Areas"})
+    
+    envperf2 = df.loc[:,['GICS.Sector','Company.Name','Revenue','CM10a.Response','CM9.Area.in.hectares']]
+    envperf2 = envperf2.rename(columns={"Company.Name":"Company"
                                     ,"CM10a.Response":"Water Withdrawal","CM9.Area.in.hectares":"Biodiversity Areas"})
 
 
@@ -1128,26 +1148,27 @@ def overallindex(sector, company_list, governance_weight, goals_weight, performa
     #################################
         
     
-    envperf_merged['Normalised GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
-    envperf_merged['Normalised GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
-    envperf_merged['Normalised Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
-    envperf_merged['Normalised Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG1'] = pd.to_numeric(envperf_merged['Total GHG1'])/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG2'] = envperf_merged['Total market-based GHG2']/envperf_merged['Revenue']
+    envperf_merged['Normalized GHG3'] = envperf_merged['Total GHG3']/envperf_merged['Revenue']
+    #envperf_merged['Normalized Water Consumption'] = envperf_merged['Water Consumption']/envperf_merged['Revenue']
+    envperf_merged['Normalized Water Withdrawal'] = envperf_merged['Water Withdrawal']/envperf_merged['Revenue']
+    envperf_merged['Normalized Biodiversity Areas'] = envperf_merged['Biodiversity Areas']/envperf_merged['Revenue']
     
     envperf_prev10 = envperf_merged
 
 #     mask8 = envperf_merged['Company'].isin(company_list)
 #     envperf_prev10 = envperf_merged[mask8]
     
-    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalised GHG1'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalised GHG2'].rank(pct=True)).fillna(0)
-    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalised GHG3'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalised Water Consumption'].rank(pct=True)).fillna(0)
-    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalised Water Withdrawal'].rank(pct=True)).fillna(0)
-    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalised Biodiversity Areas'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG1 Percentile Rank'] = (1-envperf_prev10['Normalized GHG1'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG2 Percentile Rank'] = (1-envperf_prev10['Normalized GHG2'].rank(pct=True)).fillna(0)
+    envperf_prev10['GHG3 Percentile Rank'] = (1-envperf_prev10['Normalized GHG3'].rank(pct=True)).fillna(0)
+    #envperf_prev10['Water Consumption Percentile Rank'] = (1-envperf_prev10['Normalized Water Consumption'].rank(pct=True)).fillna(0)
+    envperf_prev10['Water Withdrawal Percentile Rank'] = (1-envperf_prev10['Normalized Water Withdrawal'].rank(pct=True)).fillna(0)
+    envperf_prev10['Biodiversity Areas Percentile Rank'] = (envperf_prev10['Normalized Biodiversity Areas'].rank(pct=True)).fillna(0)
     
-    envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Consumption Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
+    #envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Consumption Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
+    envperf_prev10['envperfscore'] = envperf_prev10[['GHG1 Percentile Rank','GHG2 Percentile Rank','GHG3 Percentile Rank','Water Withdrawal Percentile Rank','Biodiversity Areas Percentile Rank']].mean(axis=1)
     envperf_prev10 = envperf_prev10.sort_values(by='envperfscore', axis=0, ascending=False)
     perfscore = envperf_prev10[['Company','envperfscore']]
     
@@ -1191,7 +1212,7 @@ def overallindex(sector, company_list, governance_weight, goals_weight, performa
     fig3.update_layout(plot_bgcolor="white", font_family='Helvetica', title_font_family="Helvetica", xaxis_nticks=len(company_list))
     fig3.update_layout(
         title=go.layout.Title(
-            text="Climate Strategy Index Based Ranking",
+            text="Climate Strategy Indices for " + sector,
             #xref="paper",
             x=0.5
         ))
@@ -1252,7 +1273,11 @@ navbar = dbc.Navbar(
 
 intro = html.Div([
     html.Br(),
-    html.H5("This page provides a comparitive sector-based analysis based on the following metrics:")])
+    html.H5("This page provides a comparitive sector-based analysis based on the following metrics:"),
+    #dmc.Button("Scroll to Top"), position={"bottom": 10, "right": 20},href = "#top"
+    html.A(dbc.Button("Scroll to top", style={'background-color':'#313339','color':'#FFFFFF'}), href="#top", style={'position':'fixed','bottom':'20px', 'right':'20px', 'z-index':'100'})
+    
+], id = 'top')
 
 list_group1 = html.Div(
     [
@@ -1286,6 +1311,7 @@ list_group2 = html.Div(
         ),
         html.Br()
     ]
+    #, style = {'position':'fixed','top':'10', 'width':'100%', 'z-index':'100'}
 )
 
 card11=dbc.Card([
@@ -1294,7 +1320,7 @@ card11=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector", style={ 'display': 'flex'}, id='ss1')],width=12),
+                    html.P("Select Sector ⇗ ", style={ 'display': 'flex'}, id='ss1')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss1")
                 
@@ -1310,7 +1336,7 @@ card11=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc1'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc1'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc1")
                     #html.P(" Add/remove companies using the dropdown",style={ 'display': 'flex',  'justify-content':'center'})
@@ -1341,7 +1367,7 @@ card21=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss2')],width=12),
+                    html.P("Select Sector ⇗",style={ 'display': 'flex'}, id='ss2')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss2")
             ]),
@@ -1356,7 +1382,7 @@ card21=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                   html.P("Choose Companies", style={ 'display': 'flex'}, id='cc2'),
+                   html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc2'),
                     dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc2")
                     ],width=12)
@@ -1387,7 +1413,7 @@ card31=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={'display': 'flex'}, id='ss3')],width=12),
+                    html.P("Select Sector ⇗",style={'display': 'flex'}, id='ss3')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss3")
             ]),
@@ -1402,7 +1428,7 @@ card31=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc3'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc3'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc3")
                     ],width=12)
@@ -1434,7 +1460,7 @@ card41=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={'display': 'flex'}, id='ss4')],width=12),
+                    html.P("Select Sector ⇗",style={'display': 'flex'}, id='ss4')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss4")
             ]),
@@ -1449,7 +1475,7 @@ card41=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc4'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc4'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc4")
                     ],width=12)
@@ -1480,7 +1506,7 @@ card51=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select sector",style={ 'display': 'flex'}, id='ss5')],width=12),
+                    html.P("Select sector ⇗",style={ 'display': 'flex'}, id='ss5')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss5")
             ]),
@@ -1495,7 +1521,7 @@ card51=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc5'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc5'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc5")
                     ],width=12)
@@ -1525,7 +1551,7 @@ card61=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss6')],width=12),
+                    html.P("Select Sector ⇗",style={ 'display': 'flex'}, id='ss6')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss6")
             ]),
@@ -1540,7 +1566,7 @@ card61=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc6'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc6'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc6")
                     ],width=12)
@@ -1570,7 +1596,7 @@ card71=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss7')],width=12),
+                    html.P("Select Sector ⇗",style={ 'display': 'flex'}, id='ss7')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss7")
             ]),
@@ -1585,7 +1611,7 @@ card71=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc7'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc7'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc7")
                     ],width=12)
@@ -1609,50 +1635,50 @@ card72=dbc.Card([
     
 ],className="m-1")
 
-card81=dbc.Card([
-    dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
-    dbc.CardBody(
-        [
-            dbc.Row([
-                dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss8')],width=12),
-                dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},target="ss8")
-            ]),
-            dbc.Row([
-                dbc.Col(
-                    dcc.Dropdown(options = [{'label': x, 'value': x} for x in sorted(set(df['GICS.Sector'].tolist())) if x is not None and not pd.isnull(x)],
-                    value='Consumer Staples',
-                    id='sector_select8')
-                ,width=12)
-            ]),
-            html.Br(),
-            html.Br(),
-            dbc.Row([
-                dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc8'),
-                dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},target="cc8")
-                    ],width=12)
-            ]),
-            dbc.Row([
-                dbc.Col(
-                    dcc.Dropdown(multi=True,
-                    id='company_select8')
-                ,width=12)
-            ])
-        ])
+# card81=dbc.Card([
+#     dbc.CardHeader("Sector and Company Selection",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+#     dbc.CardBody(
+#         [
+#             dbc.Row([
+#                 dbc.Col([
+#                     html.P("Select Sector ⇗",style={ 'display': 'flex'}, id='ss8')],width=12),
+#                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+#                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss8")
+#             ]),
+#             dbc.Row([
+#                 dbc.Col(
+#                     dcc.Dropdown(options = [{'label': x, 'value': x} for x in sorted(set(df['GICS.Sector'].tolist())) if x is not None and not pd.isnull(x)],
+#                     value='Consumer Staples',
+#                     id='sector_select8')
+#                 ,width=12)
+#             ]),
+#             html.Br(),
+#             html.Br(),
+#             dbc.Row([
+#                 dbc.Col([
+#                     html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc8'),
+#                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
+#                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc8")
+#                     ],width=12)
+#             ]),
+#             dbc.Row([
+#                 dbc.Col(
+#                     dcc.Dropdown(multi=True,
+#                     id='company_select8')
+#                 ,width=12)
+#             ])
+#         ])
     
-],className="m-1")
+# ],className="m-1")
 
-card82=dbc.Card([
-    dbc.CardHeader("TCFD Disclosure Percentage",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='tdp'),
-    dbc.CardBody(
-        [
-            dbc.Row([dbc.Col(dcc.Graph(id="tcfdper"))])
-                ])
+# card82=dbc.Card([
+#     dbc.CardHeader("TCFD Disclosure Percentage",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='tdp'),
+#     dbc.CardBody(
+#         [
+#             dbc.Row([dbc.Col(dcc.Graph(id="tcfdper"))])
+#                 ])
     
-],className="m-1")
+# ],className="m-1")
 
 
 card91=dbc.Card([
@@ -1661,7 +1687,7 @@ card91=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss9')],width=12),
+                    html.P("Select Sector ⇗",style={ 'display': 'flex'}, id='ss9')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss9")
             ]),
@@ -1676,7 +1702,7 @@ card91=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc9'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc9'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc9")
                     ],width=12)
@@ -1707,7 +1733,7 @@ card101=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss10')],width=12),
+                    html.P("Select Sector ⇗",style={ 'display': 'flex'}, id='ss10')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss10")
             ]),
@@ -1722,7 +1748,7 @@ card101=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc10'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc10'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc10")
                     ],width=12)
@@ -1753,7 +1779,7 @@ card111=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex'}, id='ss11')],width=12),
+                    html.P("Select Sector ⇗",style={ 'display': 'flex'}, id='ss11')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss11")
             ]),
@@ -1768,7 +1794,7 @@ card111=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Choose Companies", style={ 'display': 'flex'}, id='cc11'),
+                    html.P("Choose Companies ⇗", style={ 'display': 'flex'}, id='cc11'),
                 dbc.Tooltip("The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="cc11")
                     ],width=12)
@@ -1793,11 +1819,12 @@ card112=dbc.Card([
 ],className="m-1")
 
 tab2card0=dbc.Card([
-    dbc.CardHeader("Climate Strategy Index",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Climate Strategy Index",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}, id='top2'),
     dbc.CardBody(
         [
             dbc.Row([html.B("Climate Strategy Index is a sector-wise scoring methodology constructed to rank firms based on their environmental performance, governace and goals and relative weights assigned to each of these categories."),
                      html.B("Better overall strategy is associated with a higher index.")],style={"text-align":"center"}),
+            html.A(dbc.Button("Scroll to top", style={'background-color':'#313339','color':'#FFFFFF'}), href="#top2", style={'position':'fixed','bottom':'20px', 'right':'20px', 'z-index':'100'}),
             html.Br(),
 #             dbc.Row([
 #                 dbc.Col([],width=5),
@@ -1840,7 +1867,7 @@ tab2card1=dbc.Card([
         [
             dbc.Row([
                 dbc.Col([
-                    html.P("Select Sector",style={ 'display': 'flex',  'justify-content':'center'}, id='ss12')],width=12),
+                    html.P("Select Sector ⇗",style={ 'display': 'flex',  'justify-content':'center'}, id='ss12')],width=12),
                 dbc.Tooltip("Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
                             style={"textDecoration": "underline", "cursor": "pointer"},target="ss12")
             ]),
@@ -1855,19 +1882,22 @@ tab2card1=dbc.Card([
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Performance",style={'text-align':'center'}),
+                    html.P("Performance ⇗",style={'text-align':'center'}, id="perf_tool"),
+                    dbc.Tooltip("Performance metrics focuses on quantified attributes like amount of GHG emitted, water consumed and land used near key biodiversity areas",style={"textDecoration": "underline", "cursor": "pointer"},target="perf_tool"),
                     dcc.Slider(min=0, max=100, step=10, value=40, id='performance_slider')])
                 ]),
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Governance",style={'text-align':'center'}),
+                    html.P("Governance ⇗",style={'text-align':'center'}, id="gov_tool"),
+                    dbc.Tooltip("Governance metrics focuses on disclosure of administrative compliance like ESG incentives and competencies of board members, audit of reports and TCFD framework adherance of disclosures",style={"textDecoration": "underline", "cursor": "pointer"},target="gov_tool"),
                     dcc.Slider(min=0, max=100, step=10, value=30, id='governance_slider')])
             ]),
             html.Br(),
             dbc.Row([
                 dbc.Col([
-                    html.P("Goals",style={'text-align':'center'}),
+                    html.P("Goals ⇗",style={'text-align':'center'}, id="goal_tool"),
+                    dbc.Tooltip("Goals metrics focuses on the state of Net Zero goals - if there is a complete or an interim one, the inclusions therein and status of working with SBTI",style={"textDecoration": "underline", "cursor": "pointer"},target="goal_tool"),
                     dcc.Slider(min=0, max=100, step=10, value=30, id='goal_slider')])
                 ])
         ])
@@ -1875,7 +1905,7 @@ tab2card1=dbc.Card([
 ],className="m-1")
 
 tab2card2=dbc.Card([
-    dbc.CardHeader("Ranking",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
+    dbc.CardHeader("Ranking based on Climate Strategy Index",style={'background-color': '#C3D7EE', 'text-align': 'center','font-weight': 'bold','font-style': 'italic'}),
     dbc.CardBody(
         [
             dbc.Row([dbc.Col(dcc.Graph(
@@ -1930,7 +1960,7 @@ tab2card3=dbc.Card([
                 html.Br(),
                 dbc.Row([
                     dbc.Col([
-                        html.H5(["Environmental Performance Index is the average sector-based percentile ranking of the following Metrics normalised by revenue"])],width=9),
+                        html.H5(["Environmental Performance Index is the average sector-based percentile ranking of the following Metrics normalized by revenue"])],width=9),
                     dbc.Col([dbc.Button("What is Percentile Ranking?", id="per_rank_exp", n_clicks=0, outline=True, color="secondary", className="me-1")],width=3),
                     #html.H5([""]),
                             #html.Span("percentile ranking", id="percentile_tooltip"),
@@ -1976,12 +2006,12 @@ tab2card3=dbc.Card([
                 ),
                 dbc.Row(
                     [
-                        dbc.Col([
-                            dbc.Label("Water consumption", width="auto",style={'font-style': 'italic'}),
-                            dbc.Input(type="number", value=872.90, id="wc_input"),
-                            dbc.InputGroupText("mega litres")],
-                            className="me-3",
-                        ),
+#                         dbc.Col([
+#                             dbc.Label("Water consumption", width="auto",style={'font-style': 'italic'}),
+#                             dbc.Input(type="number", value=872.90, id="wc_input"),
+#                             dbc.InputGroupText("mega litres")],
+#                             className="me-3",
+#                         ),
                         dbc.Col([
                             dbc.Label("Water withdrawal", width="auto",style={'font-style': 'italic'}),
                             dbc.Input(type="number", value=5416.50, id="ww_input"),
@@ -1989,7 +2019,7 @@ tab2card3=dbc.Card([
                             className="me-3",
                         ),
                         dbc.Col([
-                            dbc.Label("Biodiversity", width="auto",id='biod_tooltip',style={'font-style': 'italic'}),
+                            dbc.Label("Biodiversity ⇗", width="auto",id='biod_tooltip',style={'font-style': 'italic'}),
                             dbc.Tooltip("Biodiversity indicates the total area of sites owned, leased, or managed in or adjacent to protected areas or key biodiversity areas ",
                          style={"textDecoration": "underline", "cursor": "pointer"},
                          target="biod_tooltip",
@@ -2059,7 +2089,7 @@ tab2card3=dbc.Card([
                     className="g-2",
                 ),
                 dbc.Row([
-                    dbc.Label("Encoding: Yes=1 ; Partial=0.5 ; No:0", width="auto")
+                    dbc.Label("Encoding: Yes=1 ; Partial=0.5 ; No=0", width="auto")
                         
                 ]),
                 dbc.Row([
@@ -2163,7 +2193,7 @@ tab2card3=dbc.Card([
                     className="g-2",
                 ),
                 dbc.Row([
-                    dbc.Label("Encoding: Yes=1 ; Committed=1 ; Validated=0.5 ; No:0 ; NA:0 ", width="auto")
+                    dbc.Label("Encoding: Yes=1 ; Committed=1 ; Validated=0.5 ; No=0 ; NA=0 ", width="auto")
                         
                 ]),
                 dbc.Row([
@@ -2172,7 +2202,7 @@ tab2card3=dbc.Card([
                         
                 ]),
                 dbc.Row([
-                    dbc.Label("Climate Strategy Index is the average of the above 3 indices:", width="auto"),
+                    dbc.Label("Climate Strategy Index is the weighted average of the above 3 indices:", width="auto"),
                     dbc.Label(id='overall_index_disp', width="auto",style={'font-weight': 'bold'}),
                         
                 ]),
@@ -2188,7 +2218,7 @@ tab2card3=dbc.Card([
 tab2card4=[dbc.Button(
                         "For more information regarding index calculation, click here",
                         outline=True,
-                        style={"background-color": "#FDB71A"},
+                        style={"background-color": "#FDB71A","color":"#000000"},
                         id="dnld_file"
                     ),dcc.Download(id="download_file")]
 
@@ -2204,7 +2234,7 @@ tab1 = html.Div([
     dbc.Row([dbc.Col([card51],width=3),dbc.Col([card52],width=9)],className="m-1"),
     dbc.Row([dbc.Col([card61],width=3),dbc.Col([card62],width=9)],className="m-1"),
     dbc.Row([dbc.Col([card71],width=3),dbc.Col([card72],width=9)],className="m-1"),
-    dbc.Row([dbc.Col([card81],width=3),dbc.Col([card82],width=9)],className="m-1"),
+#    dbc.Row([dbc.Col([card81],width=3),dbc.Col([card82],width=9)],className="m-1"),
     dbc.Row([dbc.Col([card91],width=3),dbc.Col([card92],width=9)],className="m-1"),
     dbc.Row([dbc.Col([card101],width=3),dbc.Col([card102],width=9)],className="m-1"),
     dbc.Row([dbc.Col([card111],width=3),dbc.Col([card112],width=9)],className="m-1")
@@ -2325,7 +2355,7 @@ def update_companylist4(sector):
     [Input('company_select4', 'value')]
 )
 def update_tghg3(sector,company_list):
-    fignorm=tnghg3(sector,company_list,"Normalised GHG3",1)
+    fignorm=tnghg3(sector,company_list,"Normalized GHG3",1)
     figtotal=tnghg3(sector,company_list,"Total GHG3",2)
     return figtotal, fignorm 
 
@@ -2401,14 +2431,14 @@ def update_companylist8(sector):
     value = top_companies
     return options,value
 
-@callback(
-    Output('tcfdper', 'figure'),
-    [State('sector_select8', 'value')],
-    [Input('company_select8', 'value')]
-)
-def update_tcfdper(sector,company_list):
-    figtcfdper=tcfdpercentage(sector,company_list)
-    return figtcfdper
+# @callback(
+#     Output('tcfdper', 'figure'),
+#     [State('sector_select8', 'value')],
+#     [Input('company_select8', 'value')]
+# )
+# def update_tcfdper(sector,company_list):
+#     figtcfdper=tcfdpercentage(sector,company_list)
+#     return figtcfdper
 
 @callback(
     [Output('company_select9', 'options'),
@@ -2483,7 +2513,7 @@ def update_nztar(sector,company_list):
      State('ghg1_input', 'value'),
      State('ghg2_input', 'value'),
      State('ghg3_input', 'value'),
-     State('wc_input', 'value'),
+     #State('wc_input', 'value'),
      State('ww_input', 'value'),
      State('biod_input', 'value'),
      State('ghga_input', 'value'),
@@ -2500,14 +2530,14 @@ def update_nztar(sector,company_list):
      State('ntcnps_input', 'value')]
     
 )
-def update_overallindex(sector,governance_weight, goals_weight, performance_weight, toggle, name, rev, ghg1, ghg2, ghg3, wc, ww, biod, ghga, tcfd, envskill, envcomp, nzg, nzs1, nzs2, nzs3, ntig, sbti, sbti_stat, ntcnps):
+def update_overallindex(sector,governance_weight, goals_weight, performance_weight, toggle, name, rev, ghg1, ghg2, ghg3, ww, biod, ghga, tcfd, envskill, envcomp, nzg, nzs1, nzs2, nzs3, ntig, sbti, sbti_stat, ntcnps):
     companies = company_list_from_sector(sector)
     name_bold = "<b>"+ name+ "</b>"
     if toggle:
         firm_ind = 1
     else:
         firm_ind = 0
-    new_firm_perf = [name_bold,ghg1*1000,ghg2*1000,ghg3*1000,sector,rev,wc,ww,biod]
+    new_firm_perf = [name_bold,ghg1*1000,ghg2*1000,ghg3*1000,sector,rev,ww,biod]
     new_firm_gov = [name_bold,ghga,tcfd,envskill,envcomp]
     new_firm_goal = [name_bold,nzg,nzs1,nzs2,nzs3,ntig,sbti,sbti_stat,ntcnps]
     
@@ -2529,7 +2559,7 @@ def update_overallindex(sector,governance_weight, goals_weight, performance_weig
      Input('ghg1_input', 'value'),
      Input('ghg2_input', 'value'),
      Input('ghg3_input', 'value'),
-     Input('wc_input', 'value'),
+     #Input('wc_input', 'value'),
      Input('ww_input', 'value'),
      Input('biod_input', 'value'),
      Input('ghga_input', 'value'),
@@ -2546,14 +2576,14 @@ def update_overallindex(sector,governance_weight, goals_weight, performance_weig
      Input('ntcnps_input', 'value')]
     
 )
-def update_indexplaceholders(sector,governance_weight, goals_weight, performance_weight, name, rev, ghg1, ghg2, ghg3, wc, ww, biod, ghga, tcfd, envskill, envcomp, nzg, nzs1, nzs2, nzs3, ntig, sbti, sbti_stat, ntcnps):
+def update_indexplaceholders(sector,governance_weight, goals_weight, performance_weight, name, rev, ghg1, ghg2, ghg3, ww, biod, ghga, tcfd, envskill, envcomp, nzg, nzs1, nzs2, nzs3, ntig, sbti, sbti_stat, ntcnps):
     companies = company_list_from_sector(sector)
     name_bold = "<b>"+ name+ "</b>"
 #     if toggle:
 #         firm_ind = 1
 #     else:
 #         firm_ind = 0
-    new_firm_perf = [name_bold,ghg1*1000,ghg2*1000,ghg3*1000,sector,rev,wc,ww,biod]
+    new_firm_perf = [name_bold,ghg1*1000,ghg2*1000,ghg3*1000,sector,rev,ww,biod]
     new_firm_gov = [name_bold,ghga,tcfd,envskill,envcomp]
     new_firm_goal = [name_bold,nzg,nzs1,nzs2,nzs3,ntig,sbti,sbti_stat,ntcnps]
     
