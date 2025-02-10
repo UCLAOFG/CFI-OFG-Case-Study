@@ -693,7 +693,7 @@ def overallindex(
     )
     fig3.update_layout(
         title=go.layout.Title(
-            text="Climate Strategy Indices for " + sector,
+            text=sector,
             # xref="paper",
             x=0.5,
         )
