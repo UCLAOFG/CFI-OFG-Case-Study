@@ -1289,90 +1289,96 @@ def netzerotarget(sector, company_list):
 
 navbar = dbc.Navbar(
     dbc.Container(
-        dbc.Row(
-            [
-                # Left: Case Study Button
-                dbc.Col(
-                    html.A(
-                        dbc.Button(
-                            "Link to Case Study",
-                            color="primary",
-                            size="sm",
-                            style={
-                                "backgroundColor": "#2F7DB9",
-                                "borderColor": "#2F7DB9",
-                                "color": "white",
-                            },
+        [
+            # Absolute-centered title
+            html.Div(
+                dbc.NavbarBrand(
+                    "Data Simulation",
+                    className="text-center",
+                    style={"color": "white"},
+                ),
+                style={
+                    "position": "absolute",
+                    "left": "50%",
+                    "transform": "translateX(-50%)",
+                    "top": "50%",
+                    "transform": "translate(-50%, -50%)",
+                    "zIndex": "1",
+                    "whiteSpace": "nowrap",
+                },
+            ),
+            dbc.Row(
+                [
+                    # Left: Case Study Button
+                    dbc.Col(
+                        html.A(
+                            dbc.Button(
+                                "Link to Case Study",
+                                color="primary",
+                                size="sm",
+                                style={
+                                    "backgroundColor": "#2F7DB9",
+                                    "borderColor": "#2F7DB9",
+                                    "color": "white",
+                                },
+                            ),
+                            href="https://openforgood.webflow.io/case-study-reading",
+                            target="_blank",
+                            style={"textDecoration": "none"},
                         ),
-                        href="https://openforgood.webflow.io/case-study-reading",
-                        target="_blank",
-                        style={"textDecoration": "none"},
-                    ),
-                    width="auto",
-                    align="center",
-                ),
-                # Center: Title
-                dbc.Col(
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                dbc.NavbarBrand(
-                                    "Data Simulation",
-                                    className="ms-2 text-center w-100",
-                                )
-                            ),
-                        ],
+                        width="auto",
                         align="center",
-                        className="g-0",
-                        justify="center",
                     ),
-                    align="center",
-                ),
-                # Right: Logos (horizontal for real this time)
-                dbc.Col(
-                    dbc.Row(
-                        [
-                            dbc.Col(
-                                html.A(
-                                    html.Img(
-                                        src="/assets/UCLAAndersonSOM_Wht_PMScoated.png",
-                                        height="25px",
+                    # Spacer for center space
+                    dbc.Col(),
+                    # Right: Logos
+                    dbc.Col(
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    html.A(
+                                        html.Img(
+                                            src="/assets/UCLAAndersonSOM_Wht_PMScoated.png",
+                                            height="25px",
+                                        ),
+                                        href="https://www.anderson.ucla.edu/",
+                                        target="_blank",
+                                        style={"textDecoration": "none"},
                                     ),
-                                    href="https://www.anderson.ucla.edu/",
-                                    target="_blank",
-                                    style={"textDecoration": "none"},
+                                    width="auto",
                                 ),
-                                width="auto",
-                            ),
-                            dbc.Col(
-                                html.A(
-                                    html.Img(
-                                        src="/assets/2022IMPACT New Center Logo2.png",
-                                        height="40px",
+                                dbc.Col(
+                                    html.A(
+                                        html.Img(
+                                            src="/assets/2022IMPACT New Center Logo2.png",
+                                            height="40px",
+                                        ),
+                                        href="https://www.anderson.ucla.edu/about/centers/impactanderson",
+                                        target="_blank",
+                                        style={"textDecoration": "none"},
                                     ),
-                                    href="https://www.anderson.ucla.edu/about/centers/impactanderson",
-                                    target="_blank",
-                                    style={"textDecoration": "none"},
+                                    width="auto",
                                 ),
-                                width="auto",
-                            ),
-                        ],
+                            ],
+                            className="g-2 justify-content-end",
+                            align="center",
+                        ),
+                        width="auto",
                         align="center",
-                        className="g-2 justify-content-end",
                     ),
-                    width="auto",
-                    align="center",
-                ),
-            ],
-            align="center",
-            className="w-100",
-            justify="between",
-        ),
+                ],
+                align="center",
+                className="w-100",
+                justify="between",
+            ),
+        ],
         fluid=True,
     ),
     color="#313339",
     dark=True,
+    style={"position": "relative"},
 )
+
 
 # old navbar that looks like home page and tab2
 
