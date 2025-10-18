@@ -1712,33 +1712,34 @@ card_selector = dbc.Card(
                     [
                         dbc.Col(
                             [
-                                html.P(
-                                    "Select Sector ⇗ ",
-                                    style={"display": "flex"},
-                                    id="ss_main",
-                                )
+                                html.Div(
+                                    [
+                                        html.Span("Select Sector ⇗", id="ss_main", style={"cursor": "pointer"}),
+                                    ],
+                                    style={"display": "flex", "alignItems": "center"}
+                                ),
+                                dbc.Tooltip(
+                                    "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time. This selection updates all graphs below.",
+                                    target="ss_main",
+                                    placement="right",
+                                    className="tooltip-offset",
+                                ),
                             ],
                             width=6,
                         ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time. This selection updates all graphs below.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss_main",
-                        ),
                         dbc.Col(
                             [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc_main",
+                                html.Div(
+                                    [
+                                        html.Span("Choose Companies ⇗", id="cc_main", style={"cursor": "pointer"}),
+                                    ],
+                                    style={"display": "flex", "alignItems": "center"}
                                 ),
                                 dbc.Tooltip(
                                     "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected. This selection updates all graphs below.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
                                     target="cc_main",
+                                    placement="right",
+                                    className="tooltip-offset",
                                 ),
                             ],
                             width=6,
