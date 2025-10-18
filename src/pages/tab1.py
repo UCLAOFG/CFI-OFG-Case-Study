@@ -1695,14 +1695,13 @@ list_group2 = html.Div(
 )
 
 
-card11 = dbc.Card(
+card_selector = dbc.Card(
     [
         dbc.CardHeader(
-            "Sector and Company Selection",
+            "Sector and Company Selection - Updates All Graphs Below",
             style={
                 "background-color": "#C3D7EE",
                 "text-align": "center",
-                "font-weight": "bold",
                 "font-weight": "bold",
                 "font-style": "italic",
             },
@@ -1716,16 +1715,34 @@ card11 = dbc.Card(
                                 html.P(
                                     "Select Sector ⇗ ",
                                     style={"display": "flex"},
-                                    id="ss1",
+                                    id="ss_main",
                                 )
                             ],
-                            width=12,
+                            width=6,
                         ),
                         dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
+                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time. This selection updates all graphs below.",
                             style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss1",
+                            target="ss_main",
                         ),
+                        dbc.Col(
+                            [
+                                html.P(
+                                    "Choose Companies ⇗",
+                                    style={"display": "flex"},
+                                    id="cc_main",
+                                ),
+                                dbc.Tooltip(
+                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected. This selection updates all graphs below.",
+                                    style={
+                                        "textDecoration": "underline",
+                                        "cursor": "pointer",
+                                    },
+                                    target="cc_main",
+                                ),
+                            ],
+                            width=6,
+                        )
                     ]
                 ),
                 dbc.Row(
@@ -1740,43 +1757,20 @@ card11 = dbc.Card(
                                 value="Consumer Staples",
                                 id="sector_select",
                             ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
+                            width=4,
+                        ),
                         dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc1",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc1",
-                                ),
-                                # html.P(" Add/remove companies using the dropdown",style={ 'display': 'flex',  'justify-content':'center'})
-                            ],
-                            width=12,
-                        )
+                            dcc.Dropdown(multi=True, id="company_select"),
+                            width=8,
+                        ),
                     ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select"), width=12)]
                 ),
             ]
         ),
     ],
     className="m-1",
 )
+
 
 card12 = dbc.Card(
     [
@@ -1791,87 +1785,6 @@ card12 = dbc.Card(
             id="dsfem",
         ),
         dbc.CardBody([dbc.Row([dbc.Col(dcc.Graph(id="trafficlight"))])]),
-    ],
-    className="m-1",
-)
-
-card21 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss2",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss2",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select2",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc2",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc2",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select2"), width=12)]
-                ),
-            ]
-        ),
     ],
     className="m-1",
 )
@@ -1892,87 +1805,6 @@ card22 = dbc.Card(
             [
                 dbc.Row([dbc.Col(dcc.Graph(id="tghg1"))]),
                 dbc.Row([dbc.Col(dcc.Graph(id="nghg1"))]),
-            ]
-        ),
-    ],
-    className="m-1",
-)
-
-card31 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss3",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss3",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select3",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc3",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc3",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select3"), width=12)]
-                ),
             ]
         ),
     ],
@@ -2001,88 +1833,6 @@ card32 = dbc.Card(
     className="m-1",
 )
 
-
-card41 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss4",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss4",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select4",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc4",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc4",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select4"), width=12)]
-                ),
-            ]
-        ),
-    ],
-    className="m-1",
-)
-
 card42 = dbc.Card(
     [
         dbc.CardHeader(
@@ -2099,87 +1849,6 @@ card42 = dbc.Card(
             [
                 dbc.Row([dbc.Col(dcc.Graph(id="tghg3"))]),
                 dbc.Row([dbc.Col(dcc.Graph(id="nghg3"))]),
-            ]
-        ),
-    ],
-    className="m-1",
-)
-
-card51 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss5",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss5",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select5",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc5",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc5",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select5"), width=12)]
-                ),
             ]
         ),
     ],
@@ -2203,87 +1872,6 @@ card52 = dbc.Card(
     className="m-1",
 )
 
-card61 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss6",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss6",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select6",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc6",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc6",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select6"), width=12)]
-                ),
-            ]
-        ),
-    ],
-    className="m-1",
-)
-
 card62 = dbc.Card(
     [
         dbc.CardHeader(
@@ -2297,87 +1885,6 @@ card62 = dbc.Card(
             id="bare",
         ),
         dbc.CardBody([dbc.Row([dbc.Col(dcc.Graph(id="biod"))])]),
-    ],
-    className="m-1",
-)
-
-card71 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss7",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss7",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select7",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc7",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc7",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select7"), width=12)]
-                ),
-            ]
-        ),
     ],
     className="m-1",
 )
@@ -2444,88 +1951,6 @@ card72 = dbc.Card(
 
 # ],className="m-1")
 
-
-card91 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss9",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss9",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select9",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc9",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc9",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select9"), width=12)]
-                ),
-            ]
-        ),
-    ],
-    className="m-1",
-)
-
 card92 = dbc.Card(
     [
         dbc.CardHeader(
@@ -2539,88 +1964,6 @@ card92 = dbc.Card(
             id="bec",
         ),
         dbc.CardBody([dbc.Row([dbc.Col(dcc.Graph(id="boardmem"))])]),
-    ],
-    className="m-1",
-)
-
-
-card101 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss10",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss10",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select10",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc10",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc10",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select10"), width=12)]
-                ),
-            ]
-        ),
     ],
     className="m-1",
 )
@@ -2643,86 +1986,6 @@ card102 = dbc.Card(
 )
 
 
-card111 = dbc.Card(
-    [
-        dbc.CardHeader(
-            "Sector and Company Selection",
-            style={
-                "background-color": "#C3D7EE",
-                "text-align": "center",
-                "font-weight": "bold",
-                "font-style": "italic",
-            },
-        ),
-        dbc.CardBody(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Select Sector ⇗",
-                                    style={"display": "flex"},
-                                    id="ss11",
-                                )
-                            ],
-                            width=12,
-                        ),
-                        dbc.Tooltip(
-                            "Use the arrow to select your sector of interest or start typing to see matching options. Only one sector can be selected at a time.",
-                            style={"textDecoration": "underline", "cursor": "pointer"},
-                            target="ss11",
-                        ),
-                    ]
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            dcc.Dropdown(
-                                options=[
-                                    {"label": x, "value": x}
-                                    for x in sorted(set(df["GICS.Sector"].tolist()))
-                                    if x is not None and not pd.isnull(x)
-                                ],
-                                value="Consumer Staples",
-                                id="sector_select11",
-                            ),
-                            width=12,
-                        )
-                    ]
-                ),
-                html.Br(),
-                html.Br(),
-                dbc.Row(
-                    [
-                        dbc.Col(
-                            [
-                                html.P(
-                                    "Choose Companies ⇗",
-                                    style={"display": "flex"},
-                                    id="cc11",
-                                ),
-                                dbc.Tooltip(
-                                    "The top 10 companies (based on revenue) in the chosen sector is auto-populated. Use the arrow to select your companies of interest or start typing to see matching options. Only companies in the selected sector will be shown. Multiple companies can be selected.",
-                                    style={
-                                        "textDecoration": "underline",
-                                        "cursor": "pointer",
-                                    },
-                                    target="cc11",
-                                ),
-                            ],
-                            width=12,
-                        )
-                    ]
-                ),
-                dbc.Row(
-                    [dbc.Col(dcc.Dropdown(multi=True, id="company_select11"), width=12)]
-                ),
-            ]
-        ),
-    ],
-    className="m-1",
-)
 
 card112 = dbc.Card(
     [
@@ -2750,37 +2013,20 @@ tab1 = html.Div(
         dbc.Row(
             [dbc.Col([list_group2], width="auto")], className="m-1", justify="center"
         ),
-        dbc.Row(
-            [dbc.Col([card11], width=3), dbc.Col([card12], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card21], width=3), dbc.Col([card22], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card31], width=3), dbc.Col([card32], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card41], width=3), dbc.Col([card42], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card51], width=3), dbc.Col([card52], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card61], width=3), dbc.Col([card62], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card71], width=3), dbc.Col([card72], width=9)], className="m-1"
-        ),
-        #    dbc.Row([dbc.Col([card81],width=3),dbc.Col([card82],width=9)],className="m-1"),
-        dbc.Row(
-            [dbc.Col([card91], width=3), dbc.Col([card92], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card101], width=3), dbc.Col([card102], width=9)], className="m-1"
-        ),
-        dbc.Row(
-            [dbc.Col([card111], width=3), dbc.Col([card112], width=9)], className="m-1"
-        ),
+        # Unified selector card - updates all graphs below
+        dbc.Row([dbc.Col([card_selector], width=12)], className="m-1 mb-4"),
+        # Graph cards - all controlled by the single selector above
+        dbc.Row([dbc.Col([card12], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card22], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card32], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card42], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card52], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card62], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card72], width=12)], className="m-1"),
+        #    dbc.Row([dbc.Col([card82],width=12)],className="m-1"),
+        dbc.Row([dbc.Col([card92], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card102], width=12)], className="m-1"),
+        dbc.Row([dbc.Col([card112], width=12)], className="m-1"),
     ]
 )
 
@@ -2789,6 +2035,7 @@ layout = html.Div([dbc.Row([dbc.Col(navbar)], className="mb-4"), tab1])
 
 
 def register_tab1_callbacks(app):
+    # Single callback to update company dropdown when sector changes
     @app.callback(
         [Output("company_select", "options"), Output("company_select", "value")],
         [Input("sector_select", "value")],
@@ -2799,204 +2046,54 @@ def register_tab1_callbacks(app):
         value = top_companies
         return options, value
 
+    # Unified callback to update ALL graphs when selector changes
     @app.callback(
-        Output("trafficlight", "figure"),
+        [
+            Output("trafficlight", "figure"),
+            Output("tghg1", "figure"),
+            Output("nghg1", "figure"),
+            Output("tghg2", "figure"),
+            Output("nghg2", "figure"),
+            Output("tghg3", "figure"),
+            Output("nghg3", "figure"),
+            Output("wu", "figure"),
+            Output("biod", "figure"),
+            Output("envmetgov", "figure"),
+            Output("boardmem", "figure"),
+            Output("envigoals", "figure"),
+            Output("nztar", "figure"),
+        ],
         [State("sector_select", "value")],
         [Input("company_select", "value")],
     )
-    def update_statew(sector, company_list):
-        fig = trafficlight(sector, company_list)
-        return fig
-
-    @app.callback(
-        [Output("company_select2", "options"), Output("company_select2", "value")],
-        [Input("sector_select2", "value")],
-    )
-    def update_companylist2(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        [Output("tghg1", "figure"), Output("nghg1", "figure")],
-        [State("sector_select2", "value")],
-        [Input("company_select2", "value")],
-    )
-    def update_tghg1(sector, company_list):
-        fig = tghg1(sector, company_list)
-        fig2 = nghg1(sector, company_list)
-        return fig, fig2
-
-    @app.callback(
-        [Output("company_select3", "options"), Output("company_select3", "value")],
-        [Input("sector_select3", "value")],
-    )
-    def update_companylist3(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        [Output("tghg2", "figure"), Output("nghg2", "figure")],
-        [State("sector_select3", "value")],
-        [Input("company_select3", "value")],
-    )
-    def update_tghg2(sector, company_list):
-        fig32 = tghg2(sector, company_list)
-        fig322 = nghg2(sector, company_list)
-        return fig32, fig322
-
-    @app.callback(
-        [Output("company_select4", "options"), Output("company_select4", "value")],
-        [Input("sector_select4", "value")],
-    )
-    def update_companylist4(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        [Output("tghg3", "figure"), Output("nghg3", "figure")],
-        [State("sector_select4", "value")],
-        [Input("company_select4", "value")],
-    )
-    def update_tghg3(sector, company_list):
-        fignorm = tnghg3(sector, company_list, "Normalized GHG3", 1)
-        figtotal = tnghg3(sector, company_list, "Total GHG3", 2)
-        return figtotal, fignorm
-
-    @app.callback(
-        [Output("company_select5", "options"), Output("company_select5", "value")],
-        [Input("sector_select5", "value")],
-    )
-    def update_companylist5(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        Output("wu", "figure"),
-        [State("sector_select5", "value")],
-        [Input("company_select5", "value")],
-    )
-    def update_wu(sector, company_list):
-        figu = water_util(sector, company_list)
-        return figu
-
-    @app.callback(
-        [Output("company_select6", "options"), Output("company_select6", "value")],
-        [Input("sector_select6", "value")],
-    )
-    def update_companylist6(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        Output("biod", "figure"),
-        [State("sector_select6", "value")],
-        [Input("company_select6", "value")],
-    )
-    def update_biod(sector, company_list):
-        figb = biodiver(sector, company_list)
-        return figb
-
-    @app.callback(
-        [Output("company_select7", "options"), Output("company_select7", "value")],
-        [Input("sector_select7", "value")],
-    )
-    def update_companylist7(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        Output("envmetgov", "figure"),
-        [State("sector_select7", "value")],
-        [Input("company_select7", "value")],
-    )
-    def update_envmetgov(sector, company_list):
-        figgvnmet = enviromentalgovernacemetrics(sector, company_list)[0]
-        return figgvnmet
-
-    @app.callback(
-        [Output("company_select8", "options"), Output("company_select8", "value")],
-        [Input("sector_select8", "value")],
-    )
-    def update_companylist8(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    # @app.callback(
-    #     Output('tcfdper', 'figure'),
-    #     [State('sector_select8', 'value')],
-    #     [Input('company_select8', 'value')]
-    # )
-    # def update_tcfdper(sector,company_list):
-    #     figtcfdper=tcfdpercentage(sector,company_list)
-    #     return figtcfdper
-
-    @app.callback(
-        [Output("company_select9", "options"), Output("company_select9", "value")],
-        [Input("sector_select9", "value")],
-    )
-    def update_companylist9(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        Output("boardmem", "figure"),
-        [State("sector_select9", "value")],
-        [Input("company_select9", "value")],
-    )
-    def update_boardmem(sector, company_list):
-        figboardmem = boardmember(sector, company_list)
-        return figboardmem
-
-    @app.callback(
-        [Output("company_select10", "options"), Output("company_select10", "value")],
-        [Input("sector_select10", "value")],
-    )
-    def update_companylist10(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        Output("envigoals", "figure"),
-        [State("sector_select10", "value")],
-        [Input("company_select10", "value")],
-    )
-    def update_envigoals(sector, company_list):
-        figenvigoals = environmentalgoals(sector, company_list)[0]
-        return figenvigoals
-
-    @app.callback(
-        [Output("company_select11", "options"), Output("company_select11", "value")],
-        [Input("sector_select11", "value")],
-    )
-    def update_companylist11(sector):
-        companies, top_companies = company_list(sector)
-        options = [{"label": x, "value": x} for x in companies]
-        value = top_companies
-        return options, value
-
-    @app.callback(
-        Output("nztar", "figure"),
-        [State("sector_select11", "value")],
-        [Input("company_select11", "value")],
-    )
-    def update_nztar(sector, company_list):
-        fignztar = netzerotarget(sector, company_list)
-        return fignztar
+    def update_all_graphs(sector, selected_companies):
+        # Update all graphs with the same sector and company selection
+        fig_trafficlight = trafficlight(sector, selected_companies)
+        fig_tghg1 = tghg1(sector, selected_companies)
+        fig_nghg1 = nghg1(sector, selected_companies)
+        fig_tghg2 = tghg2(sector, selected_companies)
+        fig_nghg2 = nghg2(sector, selected_companies)
+        fig_tghg3_total = tnghg3(sector, selected_companies, "Total GHG3", 2)
+        fig_tghg3_norm = tnghg3(sector, selected_companies, "Normalized GHG3", 1)
+        fig_wu = water_util(sector, selected_companies)
+        fig_biod = biodiver(sector, selected_companies)
+        fig_envmetgov = enviromentalgovernacemetrics(sector, selected_companies)[0]
+        fig_boardmem = boardmember(sector, selected_companies)
+        fig_envigoals = environmentalgoals(sector, selected_companies)[0]
+        fig_nztar = netzerotarget(sector, selected_companies)
+        
+        return (
+            fig_trafficlight,
+            fig_tghg1,
+            fig_nghg1,
+            fig_tghg2,
+            fig_nghg2,
+            fig_tghg3_total,
+            fig_tghg3_norm,
+            fig_wu,
+            fig_biod,
+            fig_envmetgov,
+            fig_boardmem,
+            fig_envigoals,
+            fig_nztar,
+        )
