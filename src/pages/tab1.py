@@ -2788,7 +2788,7 @@ tab1 = html.Div(
 layout = html.Div([dbc.Row([dbc.Col(navbar)], className="mb-4"), tab1])
 
 
-def register_tab2_callbacks(app):
+def register_tab1_callbacks(app):
     @app.callback(
         [Output("company_select", "options"), Output("company_select", "value")],
         [Input("sector_select", "value")],
