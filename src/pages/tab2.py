@@ -1060,7 +1060,13 @@ tab2card3 = dbc.Card(
                                 ),
                                 dbc.Label("in", width="auto"),
                                 dbc.Label(id="firmsector_input", width="auto"),
-                                dbc.Label("sector having annual Revenue", width="auto"),
+                                dbc.Label("sector", width="auto"),
+                            ],
+                            className="g-2",
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Label("having annual Revenue", width="auto"),
                                 dbc.Col(
                                     dbc.InputGroup(
                                         [
@@ -1573,7 +1579,7 @@ tab2card4 = [
 
 tab2 = html.Div(
     [ 
-        dbc.Row([tab2card0], className="m-1"),
+        dbc.Row([tab2card0], className="m-1 mt-3"),
         dbc.Row(
             [
                 dbc.Col(
