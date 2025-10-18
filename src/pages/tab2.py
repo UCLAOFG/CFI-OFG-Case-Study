@@ -1572,7 +1572,7 @@ tab2card4 = [
 ]
 
 tab2 = html.Div(
-    [
+    [ 
         dbc.Row([tab2card0], className="m-1"),
         dbc.Row(
             [
@@ -1594,7 +1594,8 @@ tab2 = html.Div(
         ),
         # dbc.Row([dbc.Col([tab2card2],width=12)],className="mb-4 ml-3"),
         # dbc.Row([dbc.Col([tab2card3],width=6)],className="mb-4 ml-3")
-    ]
+    ], 
+    className='px-5',
 )
 
 layout = html.Div([dbc.Row([dbc.Col(navbar)], className="mb-4"), tab2])

@@ -2013,20 +2013,25 @@ tab1 = html.Div(
         dbc.Row(
             [dbc.Col([list_group2], width="auto")], className="m-1", justify="center"
         ),
-        # Unified selector card - updates all graphs below
-        dbc.Row([dbc.Col([card_selector], width=12)], className="m-1 mb-4"),
-        # Graph cards - all controlled by the single selector above
-        dbc.Row([dbc.Col([card12], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card22], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card32], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card42], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card52], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card62], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card72], width=12)], className="m-1"),
-        #    dbc.Row([dbc.Col([card82],width=12)],className="m-1"),
-        dbc.Row([dbc.Col([card92], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card102], width=12)], className="m-1"),
-        dbc.Row([dbc.Col([card112], width=12)], className="m-1"),
+        html.Div(
+            [
+                # Unified selector card - updates all graphs below
+                dbc.Row([dbc.Col([card_selector], width=12)], className="m-1 mb-4"),
+                # Graph cards - all controlled by the single selector above
+                dbc.Row([dbc.Col([card12], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card22], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card32], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card42], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card52], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card62], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card72], width=12)], className="m-1"),
+                #    dbc.Row([dbc.Col([card82],width=12)],className="m-1"),
+                dbc.Row([dbc.Col([card92], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card102], width=12)], className="m-1"),
+                dbc.Row([dbc.Col([card112], width=12)], className="m-1"),
+            ],
+            className="px-5",
+        ),
     ]
 )
 
